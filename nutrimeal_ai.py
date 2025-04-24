@@ -14,6 +14,9 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import plotly.express as px
 import random
+import streamlit as st
+st.write("App started...")
+
 
 # Load data
 df = pd.read_csv("foods.csv")

@@ -8,6 +8,58 @@ Original file is located at
 
 ### **NutriMeal AI**
 """
+import streamlit as st
+import pandas as pd
+import matplotlib.pyplot as plt
+
+# Load dataset
+@st.cache_data
+def load_data():
+    return pd.read_csv("foods.csv")
+
+df = load_data()
+
+# Judul Aplikasi
+st.set_page_config(page_title="NutriMeal AI", page_icon="🥗", layout="centered")
+st.title("🥗 NutriMeal AI")
+st.markdown("### Menu Sehat Otomatis Berdasarkan Tujuan Gizi Kamu")
+
+# Sidebar: Profil Pengguna
+st.sidebar.header("🧍 Profil Kamu")
+goal = st.sidebar.selectbox("🎯 Tujuan Gizi", ["Diet", "Bulking", "Maintain"])
+max_cal = st.sidebar.slider("🔥 Batas Kalori Maksimum", 100, 1500, 500, step=50)
+min_protein = st.sidebar.slider("💪 Minimal Protein (gram)", 0, 100, 20)
+
+df_filtered = df[(df['Calories'] <= max_cal) & (df['Protein'] >= min_protein)]
+
+# Tombol untuk rekomendasi
+st.markdown("---")
+st.subheader("🍽️ Rekomendasi Menu Harian")
+if st.button("Tampilkan Rekomendasi"):
+    if df_filtered.empty:
+        st.warning("Tidak ada makanan yang sesuai dengan filter kamu. Coba ubah filter!")
+    else:
+        st.success(f"Menampilkan {len(df_filtered)} makanan dengan kalori ≤ {max_cal} dan protein ≥ {min_protein}g")
+        st.dataframe(df_filtered[["Food", "Calories", "Protein", "Fat", "Carbs"]].reset_index(drop=True))
+
+# Visualisasi Komposisi Nutrisi
+st.markdown("---")
+st.subheader("📊 Visualisasi Komposisi Gizi")
+if not df_filtered.empty:
+    avg_nutrients = df_filtered[["Protein", "Fat", "Carbs"]].mean()
+    fig, ax = plt.subplots()
+    ax.pie(avg_nutrients, labels=avg_nutrients.index, autopct="%1.1f%%", startangle=90)
+    ax.axis("equal")
+    st.pyplot(fig)
+
+# Tips Harian
+st.markdown("---")
+st.subheader("💡 Tips Gizi Harian")
+st.info("Minumlah air putih minimal 8 gelas per hari untuk membantu metabolisme dan menjaga hidrasi tubuh.")
+
+# Footer
+st.markdown("---")
+st.caption("Dibuat oleh NutriMeal AI · 2025")
 
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -350,55 +402,3 @@ def tampilkan_kuis():
 
 tampilkan_kuis()
 
-import streamlit as st
-import pandas as pd
-import matplotlib.pyplot as plt
-
-# Load dataset
-@st.cache_data
-def load_data():
-    return pd.read_csv("foods.csv")
-
-df = load_data()
-
-# Judul Aplikasi
-st.set_page_config(page_title="NutriMeal AI", page_icon="🥗", layout="centered")
-st.title("🥗 NutriMeal AI")
-st.markdown("### Menu Sehat Otomatis Berdasarkan Tujuan Gizi Kamu")
-
-# Sidebar: Profil Pengguna
-st.sidebar.header("🧍 Profil Kamu")
-goal = st.sidebar.selectbox("🎯 Tujuan Gizi", ["Diet", "Bulking", "Maintain"])
-max_cal = st.sidebar.slider("🔥 Batas Kalori Maksimum", 100, 1500, 500, step=50)
-min_protein = st.sidebar.slider("💪 Minimal Protein (gram)", 0, 100, 20)
-
-df_filtered = df[(df['Calories'] <= max_cal) & (df['Protein'] >= min_protein)]
-
-# Tombol untuk rekomendasi
-st.markdown("---")
-st.subheader("🍽️ Rekomendasi Menu Harian")
-if st.button("Tampilkan Rekomendasi"):
-    if df_filtered.empty:
-        st.warning("Tidak ada makanan yang sesuai dengan filter kamu. Coba ubah filter!")
-    else:
-        st.success(f"Menampilkan {len(df_filtered)} makanan dengan kalori ≤ {max_cal} dan protein ≥ {min_protein}g")
-        st.dataframe(df_filtered[["Food", "Calories", "Protein", "Fat", "Carbs"]].reset_index(drop=True))
-
-# Visualisasi Komposisi Nutrisi
-st.markdown("---")
-st.subheader("📊 Visualisasi Komposisi Gizi")
-if not df_filtered.empty:
-    avg_nutrients = df_filtered[["Protein", "Fat", "Carbs"]].mean()
-    fig, ax = plt.subplots()
-    ax.pie(avg_nutrients, labels=avg_nutrients.index, autopct="%1.1f%%", startangle=90)
-    ax.axis("equal")
-    st.pyplot(fig)
-
-# Tips Harian
-st.markdown("---")
-st.subheader("💡 Tips Gizi Harian")
-st.info("Minumlah air putih minimal 8 gelas per hari untuk membantu metabolisme dan menjaga hidrasi tubuh.")
-
-# Footer
-st.markdown("---")
-st.caption("Dibuat oleh NutriMeal AI · 2025")
